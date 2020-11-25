@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Check arguments number
+if [ -z "$1" ]; then
+  echo "At least one argument is missing !"
+  echo "./lets_crack [TARGETS]"
+  exit 1
+fi
+
+# If "-reset" argument, then delete last results
+if [ "$2" = "--reset" ]; then
+	echo > results/pre_results.txt && rm results/pre_results.txt
+  echo > results/results.txt && rm results/results.txt
+fi
+
+# Check if targets uses the require format
+if [ ! $(sed -n '1p' "$1" | grep -E -i "0x[0-9a-f]{40}") ]; then
+	echo "TARGETS format not acceptable, need address public \"0x16ab...\" "
+	echo "./lets_crack [TARGETS]"
+	exit 1
+fi
+
+# Browse all the wordlists
+for file in ./wordlists/*
+do
+		if [ $(echo "$file" | grep "_address.txt") ]; then
+			continue
+		fi
+
+		# Check if operation has already been done with this wordlist
+		file_short=$(echo "$file" | cut -c3- | cut -f 1 -d '.')
+		address="_address.txt"
+		file_address="$file_short$address"
+
+		if [ ! -f $file_address ]; then
+			python3 tools-py/transform.py "$file"
+		fi
+
+		# Let's crack
+		./crack "$1" "$file" >> results/pre_results.txt
+
+		echo "Done: " "$file"
+done
+
+# Create/Delete files
+echo > results/last_targets.txt && rm results/last_targets.txt
+echo > results/tmp_results.txt
+
+# Sort and save results
+while IFS= read -r line
+do
+	IFS=', ' read -r -a array <<< "$line"
+	filename=${array[0]}
+	file_short=${filename%"_address.txt"}
+  echo $(sed -n ${array[1]}p ./"$file_short".txt) - ${array[2]} >> results/tmp_results.txt
+done < results/pre_results.txt
+awk '!seen[$0]++' results/tmp_results.txt > results/results.txt
+rm results/tmp_results.txt
+rm results/pre_results.txt
+
+# Save targets left
+while IFS= read -r line
+do
+	if [[ ! $(cat results/results.txt | grep "$line") ]]; then
+	  echo "$line" >> results/last_targets.txt
+	fi
+done < $1
+
+# If "--balance" argument, then display balance of all wallet
+if [ "$2" = "--balance" ] || [ "$3" = "--balance" ]; then
+	while IFS= read -r line
+	do
+		address=$(echo "$line" | grep -E -i -o "[0-9a-f]{40}")
+		echo "$line" "-" $(curl -s https://api.blockcypher.com/v1/eth/main/addrs/"$address" | jq ".balance")
+	done < ./results/results.txt
+	exit
+fi
