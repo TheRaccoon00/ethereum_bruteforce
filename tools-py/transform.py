@@ -12,7 +12,7 @@ if len(sys.argv) != 2:
 	print("Argument is missing. Usage: python3 transform.py [WORDLIST].txt")
 	sys.exit()
 
-if sys.argv[1][-4] != ".txt":
+if sys.argv[1][-4:] != ".txt":
 	print("The wordlist needs to be a txt file !")
 	sys.exit()
 
