@@ -10,9 +10,9 @@ Minimum:
 + [linux](https://www.gnu.org/home.fr.html)
 + make
 
-Necesary libraries,
-	pip3 install coincurve
-	pip3 install pysha3
+Python libraries required:
++ pip3 install coincurve
++ pip3 install pysha3
 
 ## Compilation
 
@@ -22,19 +22,19 @@ make
 
 ## Prep
 
-Add your worlists **in .txt format** in the folder:
+Add your wordlists **in .txt format** in the folder:
 ```
 ./wordlists/
 ```
 
 ## Usage
 
-Brutefoce targets from wordlists **previoulsy added**
+Bruteforce targets from wordlists **previoulsy added**
 ```
 ./lets_crack [TARGETS_FILE] --reset
 ```
 
-Brutefoce targets from wordlists **previoulsy added**, and display balance on the wallet (limited API !)
+Bruteforce targets from wordlists **previoulsy added**, and display balance on the wallet (limited API !)
 ```
 ./lets_crack [TARGETS_FILE] --reset --balance
 ```
@@ -42,3 +42,7 @@ Brutefoce targets from wordlists **previoulsy added**, and display balance on th
 ## Example
 
 An example is available with some indian cities with the results in the "results" folder.
+
+## Warning
+
+**This project is only for FUN. Do not steal anything from any wallets you find. Be respectful.**
